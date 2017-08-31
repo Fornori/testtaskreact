@@ -1,0 +1,87 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.6.RELEASE'
+	}
+	repositories {
+		maven {
+			url "http://maven.grogard.net/content/groups/public/"
+		}
+		maven {
+			url "http://maven.grogard.net/content/groups/grogard/"
+		}
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+plugins {
+	id 'java'
+	id 'eclipse'
+	id 'org.springframework.boot' version "1.5.6.RELEASE"
+	id "com.moowork.node" version "1.1.1"
+}
+
+
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+node {
+	// Version of node to use.
+	version = '6.9.4'
+
+	// Version of npm to use.
+	npmVersion = '4.1.2'
+
+	// Version of Yarn to use.
+	yarnVersion = '0.16.1'
+
+	// Base URL for fetching node distributions (change if you have a mirror).
+	distBaseUrl = 'https://nodejs.org/dist'
+
+	// If true, it will download node using above parameters.
+	// If false, it will try to use globally installed node.
+	download = true
+
+	// Set the work directory for unpacking node
+	workDir = file("${project.buildDir}/nodejs")
+
+	// Set the work directory for NPM
+	npmWorkDir = file("${project.buildDir}/npm")
+
+	// Set the work directory for Yarn
+	yarnWorkDir = file("${project.buildDir}/yarn")
+
+	// Set the work directory where node_modules should be located
+	nodeModulesDir = file("${project.projectDir}")
+}
+
+repositories {
+	maven {
+		url "http://maven.grogard.net/content/groups/public/"
+	}
+	maven {
+		url "http://maven.grogard.net/content/groups/grogard/"
+	}
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+task webpack(type: NodeTask, dependsOn: 'npmInstall') {
+	def osName = System.getProperty("os.name").toLowerCase()
+	if (osName.contains("windows")) {
+		script = project.file('node_modules/webpack/bin/webpack.js')
+	} else {
+		script = project.file('node_modules/.bin/webpack')
+	}
+}
+
+
+processResources.dependsOn 'webpack'
+
+clean.delete << file('node_modules')
+clean.delete << file('src/main/webapp/dist')

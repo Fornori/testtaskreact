@@ -1,0 +1,23 @@
+package com.example.demo;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+
+@Controller
+public class PageController {
+
+    public PageController() {
+        super();
+    }
+
+    /**
+     * @return String
+     */
+    @RequestMapping({"/", "index.html", "create.html", "detail.html", "detail/**"})
+    public String index(HttpServletRequest request) {
+        return "index";
+    }
+
+}
